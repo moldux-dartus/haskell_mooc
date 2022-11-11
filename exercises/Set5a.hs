@@ -345,10 +345,20 @@ inc (O b) = I b
 inc (I b) = O (inc b)
 
 prettyPrint :: Bin -> String
-prettyPrint = todo
+prettyPrint End = []
+prettyPrint (O b) = prettyPrint b ++ show 0
+prettyPrint (I b) = prettyPrint b ++ show 1
 
 fromBin :: Bin -> Int
-fromBin = todo
+fromBin b' = recurse b' 0
+  where recurse (O End) i = i 
+        recurse (I End) i = 1
+        recurse (O b) i = 2 * (recurse b i)  
+        recurse (I b) i = (recurse b i) *2 + 1
 
 toBin :: Int -> Bin
-toBin = todo
+toBin i' = recurse i' End 
+  where recurse i b | i == 0 = O b  
+                    | i == 1 = I b
+                    | even i = O (recurse (i `div` 2) b)
+                    | otherwise = I (recurse ((i -1) `div` 2) b)

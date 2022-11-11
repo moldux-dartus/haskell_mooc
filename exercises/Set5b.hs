@@ -3,6 +3,7 @@
 module Set5b where
 
 import Mooc.Todo
+import Data.Maybe
 
 -- The next exercises use the binary tree type defined like this:
 
@@ -180,7 +181,10 @@ data Step = StepL | StepR
 --   walk [StepL,StepL] (Node 1 (Node 2 Empty Empty) Empty)  ==>  Nothing
 
 walk :: [Step] -> Tree a -> Maybe a
-walk = todo
+walk _ Empty                   = Nothing
+walk [] (Node v l r)           = Just v 
+walk ((StepL):xs) (Node _ l _) = walk xs l
+walk ((StepR):xs) (Node _ _ r) = walk xs r  
 
 ------------------------------------------------------------------------------
 -- Ex 9: given a tree, a path and a value, set the value at the end of
@@ -201,7 +205,10 @@ walk = todo
 --   set [StepL,StepR] 1 (Node 0 Empty Empty)  ==>  (Node 0 Empty Empty)
 
 set :: [Step] -> a -> Tree a -> Tree a
-set path val tree = todo
+set _ _ Empty = Empty
+set [] val (Node v l r) = Node val l r
+set ((StepL):xs) val (Node v l r) = Node v (set xs val l ) r
+set ((StepR):xs) val (Node v l r) = Node v l (set xs val r)
 
 ------------------------------------------------------------------------------
 -- Ex 10: given a value and a tree, return a path that goes from the
@@ -217,4 +224,4 @@ set path val tree = todo
 --                    (Node 5 Empty Empty))                     ==>  Just [StepL,StepR]
 
 search :: Eq a => a -> Tree a -> Maybe [Step]
-search = todo
+search val tree = todo

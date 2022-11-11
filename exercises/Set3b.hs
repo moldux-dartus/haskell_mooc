@@ -51,16 +51,13 @@ buildList start count end = start : buildList start (count-1) end
 -- Ps. you'll probably need a recursive helper function
 
 sums :: Int -> [Int]
-sums 0 = [0]
-sums i = todo {-(reverse (factorial i)) : sums (i-1)
-    where factorial 0 = [0]
-          factorial n = factorial (n-1) + n
-          (++) acc [] = acc
-          (++) acc (x:xs) = (++) (x:acc) xs
-          reverse [] = []
-          reverse (x:xs) = (reverse xs) ++ [x]
-            -}
-
+sums 0 = []
+sums i = sums (i-1) ++ go i 0
+  where go 0 acc = acc
+        go i acc = go (i-1) (acc+i)
+        (++) []     a = a : []
+        (++) (x:xs) a = x : xs ++ a
+        
 ------------------------------------------------------------------------------
 -- Ex 3: define a function mylast that returns the last value of the
 -- given list. For an empty list, a provided default value is
@@ -93,7 +90,9 @@ mylast def [] = def
 --   indexDefault ["a","b","c"] (-1) "d" ==> "d"
 
 indexDefault :: [a] -> Int -> a -> a
-indexDefault xs i def = todo
+indexDefault [] i def = def
+indexDefault (x:xs) 0 def = x 
+indexDefault (x:xs) i def = indexDefault xs (i-1) def
 
 ------------------------------------------------------------------------------
 -- Ex 5: define a function that checks if the given list is in
@@ -102,7 +101,9 @@ indexDefault xs i def = todo
 -- Use pattern matching and recursion to iterate through the list.
 
 sorted :: [Int] -> Bool
-sorted xs = todo
+sorted [] = True 
+sorted [a] = True
+sorted (x:y:xs) = x <= y && sorted (y:xs)
 
 ------------------------------------------------------------------------------
 -- Ex 6: compute the partial sums of the given list like this:
@@ -114,7 +115,9 @@ sorted xs = todo
 -- Use pattern matching and recursion (and the list constructors : and [])
 
 sumsOf :: [Int] -> [Int]
-sumsOf xs = todo
+sumsOf [] = []
+sumsOf [a] = [a]
+sumsOf (x:y:xs) = x : sumsOf ((x+y):xs)
 
 ------------------------------------------------------------------------------
 -- Ex 7: implement the function merge that merges two sorted lists of
@@ -127,7 +130,11 @@ sumsOf xs = todo
 --   merge [1,1,6] [1,2]   ==> [1,1,1,2,6]
 
 merge :: [Int] -> [Int] -> [Int]
-merge xs ys = todo
+merge [] ys = ys 
+merge xs [] = xs
+merge l1@(x:xs) l2@(y:ys)
+  | x <= y = x : merge xs l2
+  | x >  y = y : merge l1 ys
 
 ------------------------------------------------------------------------------
 -- Ex 8: define the function mymaximum that takes a list and a
@@ -146,7 +153,10 @@ merge xs ys = todo
 --     ==> [1,2]
 
 mymaximum :: (a -> a -> Bool) -> a -> [a] -> a
-mymaximum bigger initial xs = todo
+mymaximum bigger initial []     = initial
+mymaximum bigger initial (x:xs) = if initial `bigger` x 
+                                  then mymaximum bigger initial xs
+                                  else mymaximum bigger x xs
 
 ------------------------------------------------------------------------------
 -- Ex 9: define a version of map that takes a two-argument function
@@ -160,7 +170,9 @@ mymaximum bigger initial xs = todo
 -- Use recursion and pattern matching. Do not use any library functions.
 
 map2 :: (a -> b -> c) -> [a] -> [b] -> [c]
-map2 f as bs = todo
+map2 f [] l = []
+map2 f l [] = []
+map2 f (x:xs) (y:ys) = f x y : map2 f xs ys
 
 ------------------------------------------------------------------------------
 -- Ex 10: implement the function maybeMap, which works a bit like a
@@ -184,4 +196,6 @@ map2 f as bs = todo
 --   ==> []
 
 maybeMap :: (a -> Maybe b) -> [a] -> [b]
-maybeMap f xs = todo
+maybeMap f [] = []
+maybeMap f (x:xs) = case f x of Nothing -> maybeMap f xs
+                                Just e  -> e : maybeMap f xs

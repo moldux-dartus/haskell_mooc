@@ -201,9 +201,33 @@ freqs xs = foldr insert Map.empty xs
 --     ==> fromList [("Bob",100),("Mike",50)]
 --   transfer "Lisa" "Mike" 20 bank
 --     ==> fromList [("Bob",100),("Mike",50)]
+{-
+*** Failed! Falsified (after 1 test):
+transfer "Lisa" "Mike" 49 (fromList [("Jane",64),("Lisa",59),("Mike",4)])
+  Expected:                fromList [("Jane",64),("Lisa",10),("Mike",53)]
+  Was:                     fromList [("Jane",64),("Lisa",-10),("Mike",53)]
 
-transfer :: String -> String -> Int -> Map.Map String Int -> Map.Map String Int
-transfer from to amount bank = todo
+transfer "Bob" "Jane" (-60) (fromList [("Bob",98),("Jane",89),("Lisa",37)])
+  Expected:                  fromList [("Bob",98),("Jane",89),("Lisa",37)]
+  Was:                       fromList [("Bob",-158),("Jane",29),("Lisa",37)]
+-}
+
+
+type Bank = Map.Map String Int
+
+transfer :: String -> String -> Int -> Bank -> Bank
+transfer sender recip amount bank = if allValid then Map.insertWith (+) recip amount (Map.insertWith (flip (-)) sender amount bank) else bank
+  where allValid = sender `accountExists` bank 
+                && recip `accountExists` bank 
+                && hasFunds sender amount bank
+                && amount > 0
+
+accountExists :: String -> Bank -> Bool
+accountExists = Map.member 
+
+hasFunds :: String -> Int -> Bank -> Bool
+hasFunds from amount bank = case Map.lookup from bank of Nothing  -> False
+                                                         Just bal -> bal >= amount
 
 ------------------------------------------------------------------------------
 -- Ex 11: given an Array and two indices, swap the elements in the indices.
@@ -213,7 +237,9 @@ transfer from to amount bank = todo
 --         ==> array (1,4) [(1,"one"),(2,"three"),(3,"two"),(4,"four")]
 
 swap :: Ix i => i -> i -> Array i a -> Array i a
-swap i j arr = todo
+swap i j arr = arr // [(i,(arr ! j)),(j,(arr ! i))]
+  
+  --arr ! i , arr ! j
 
 ------------------------------------------------------------------------------
 -- Ex 12: given an Array, find the index of the largest element. You
@@ -224,4 +250,4 @@ swap i j arr = todo
 -- Hint: check out Data.Array.indices or Data.Array.assocs
 
 maxIndex :: (Ix i, Ord a) => Array i a -> i
-maxIndex = todo
+maxIndex arr = fst $ head $ filter (\x -> (snd x) == (maximum $ elems arr)) (assocs arr)
