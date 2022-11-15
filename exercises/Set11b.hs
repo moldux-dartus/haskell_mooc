@@ -21,8 +21,8 @@ import Mooc.Todo
 
 appendAll :: IORef String -> [String] -> IO ()
 appendAll io xs = do
-    let x = concat xs 
-    modifyIORef io (flip (++) x)
+    let x = concat xs
+    modifyIORef io (++ x)
 
 ------------------------------------------------------------------------------
 -- Ex 2: Given two IORefs, swap the values stored in them.
@@ -37,10 +37,10 @@ appendAll io xs = do
 --   "x"
 
 swapIORefs :: IORef a -> IORef a -> IO ()
-swapIORefs a b = do 
+swapIORefs a b = do
     ioA <- readIORef a
-    ioB <- readIORef b 
-    writeIORef b ioA 
+    ioB <- readIORef b
+    writeIORef b ioA
     writeIORef a ioB
 
 ------------------------------------------------------------------------------
@@ -68,8 +68,8 @@ swapIORefs a b = do
 
 doubleCall :: IO (IO a) -> IO a
 doubleCall op = do
-    ret <- op 
-    t <- ret 
+    ret <- op
+    t <- ret
     return t
 
 {-is equivalent to 
@@ -134,7 +134,9 @@ compose op1 op2 c = do
 --   ["module Set11b where","","import Control.Monad"]
 
 hFetchLines :: Handle -> IO [String]
-hFetchLines = todo
+hFetchLines f = do 
+    file <- hGetContents f
+    return (lines file)
 
 ------------------------------------------------------------------------------
 -- Ex 6: Given a Handle and a list of line indexes, produce the lines
@@ -147,8 +149,10 @@ hFetchLines = todo
 -- handle.
 
 hSelectLines :: Handle -> [Int] -> IO [String]
-hSelectLines h nums = todo
-
+hSelectLines h nums = do 
+    file <- hFetchLines h
+    let r = map ((file !!) . (\n -> n - 1)) nums
+    return r
 ------------------------------------------------------------------------------
 -- Ex 7: In this exercise we see how a program can be split into a
 -- pure part that does all of the work, and a simple IO wrapper that
@@ -188,4 +192,10 @@ counter ("print",n) = (True,show n,n)
 counter ("quit",n)  = (False,"bye bye",n)
 
 interact' :: ((String,st) -> (Bool,String,st)) -> st -> IO st
-interact' f state = todo
+interact' f state = do
+    i <- getLine
+    let step = f (i, state)
+    case step of (True, s, st) -> do putStrLn s 
+                                     interact' f st
+                 (False, s,st) -> do putStrLn s
+                                     return st
