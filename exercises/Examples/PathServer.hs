@@ -14,7 +14,7 @@ makeResponse status text =
 
 serveSource :: IO Response
 serveSource = do
-  source <- readFile "PathServer.hs"
+  source <- readFile "Examples/PathServer.hs"
   return $ makeResponse status200 (T.pack source)
 
 serveSecret :: IO Response

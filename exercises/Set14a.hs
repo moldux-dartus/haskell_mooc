@@ -5,6 +5,7 @@ module Set14a where
 
 import Mooc.Todo
 
+import Data.List
 import Data.Bits
 import Data.Char
 import Data.Text.Encoding
@@ -28,7 +29,10 @@ import qualified Data.ByteString.Lazy as BL
 --  greetText (T.pack "Benedict Cumberbatch") ==> "Hello, Benedict Cumber...!"
 
 greetText :: T.Text -> T.Text
-greetText = todo
+greetText name = T.pack "Hello, " <> n <> T.pack "!"
+    where n = if T.length name > 15 
+                then T.take 15 name <> T.pack "..." 
+                else name 
 
 ------------------------------------------------------------------------------
 -- Ex 2: Capitalize every second word of a Text.
@@ -40,7 +44,7 @@ greetText = todo
 --     ==> "WORD"
 
 shout :: T.Text -> T.Text
-shout = todo
+shout s = T.unwords $ map (\(a, s) -> if odd a then T.toUpper s else s) $ zip [1..] (T.words s )
 
 ------------------------------------------------------------------------------
 -- Ex 3: Find the longest sequence of a single character repeating in
@@ -51,7 +55,9 @@ shout = todo
 --   longestRepeat (T.pack "aabbbbccc") ==> 4
 
 longestRepeat :: T.Text -> Int
-longestRepeat = todo
+longestRepeat ts
+    | null (T.unpack ts) = 0
+    | otherwise          = length $ last $ sortOn length $ group $ T.unpack ts
 
 ------------------------------------------------------------------------------
 -- Ex 4: Given a lazy (potentially infinite) Text, extract the first n
@@ -64,7 +70,7 @@ longestRepeat = todo
 --   takeStrict 15 (TL.pack (cycle "asdf"))  ==>  "asdfasdfasdfasd"
 
 takeStrict :: Int64 -> TL.Text -> T.Text
-takeStrict = todo
+takeStrict n = TL.toStrict . TL.take n 
 
 ------------------------------------------------------------------------------
 -- Ex 5: Find the difference between the largest and smallest byte
@@ -76,7 +82,9 @@ takeStrict = todo
 --   byteRange (B.pack [3]) ==> 0
 
 byteRange :: B.ByteString -> Word8
-byteRange = todo
+byteRange b 
+    | (B.length b) < 2 = 0 
+    | otherwise        = B.maximum b - B.minimum b
 
 ------------------------------------------------------------------------------
 -- Ex 6: Compute the XOR checksum of a ByteString. The XOR checksum of
