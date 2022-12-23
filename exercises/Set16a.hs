@@ -18,7 +18,7 @@ import Data.List
 --  +++ OK, passed 1 test.
 
 isSorted :: (Show a, Ord a) => [a] -> Property
-isSorted = todo
+isSorted xs = xs === sort xs
 
 ------------------------------------------------------------------------------
 -- Ex 2: In this and the following exercises, we'll build a suite of
@@ -50,7 +50,7 @@ isSorted = todo
 --  +++ OK, passed 1 test.
 
 sumIsLength :: Show a => [a] -> [(a,Int)] -> Property
-sumIsLength input output = todo
+sumIsLength input output = length input === sum (map snd output)
 
 -- This is a function that passes the sumIsLength test but is wrong
 freq1 :: Eq a => [a] -> [(a,Int)]
@@ -79,7 +79,8 @@ freq1 (x:y:xs) = [(x,1),(y,length xs + 1)]
 --  +++ OK, passed 100 tests.
 
 inputInOutput :: (Show a, Eq a) => [a] -> [(a,Int)] -> Property
-inputInOutput input output = todo
+inputInOutput input output = forAll (elements input) (`elem` map fst output)
+
 
 -- This function passes both the sumIsLength and inputInOutput tests
 freq2 :: Eq a => [a] -> [(a,Int)]
@@ -110,7 +111,7 @@ freq2 xs = map (\x -> (x,1)) xs
 --  +++ OK, passed 100 tests.
 
 outputInInput :: (Show a, Eq a) => [a] -> [(a,Int)] -> Property
-outputInInput input output = todo
+outputInInput input output = forAll (elements output) (\(x,n) -> length (filter (==x) input) === n)
 
 -- This function passes the outputInInput test but not the others
 freq3 :: Eq a => [a] -> [(a,Int)]
@@ -139,7 +140,11 @@ freq3 (x:xs) = [(x,1 + length (filter (==x) xs))]
 --  +++ OK, passed 100 tests.
 
 frequenciesProp :: ([Char] -> [(Char,Int)]) -> NonEmptyList Char -> Property
-frequenciesProp freq input = todo
+frequenciesProp freq (NonEmpty input) = let output = freq input
+                                        in  sumIsLength   input output .&&.
+                                            inputInOutput input output .&&.
+                                            outputInInput input output
+--  where output = freq input
 
 frequencies :: Eq a => [a] -> [(a,Int)]
 frequencies [] = []
@@ -170,7 +175,11 @@ frequencies (x:ys) = (x, length xs) : frequencies others
 --  [2,4,10]
 
 genList :: Gen [Int]
-genList = todo
+genList = do
+  let n = elements [0..10]
+  l <- chooseInt (3,5)
+  list <- vectorOf l n
+  return (sort list)
 
 ------------------------------------------------------------------------------
 -- Ex 7: Here are the datatypes Arg and Expression from Set 15. Write

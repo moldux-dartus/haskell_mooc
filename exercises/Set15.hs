@@ -307,7 +307,7 @@ instance MyApplicative [] where
   myLiftA2 f as bs = [ f a b | a <- as, b <- bs ]
 
 (<#>) :: MyApplicative f => f (a -> b) -> f a -> f b
-f <#> x = myLiftA2 id f x
+f <#> x = myLiftA2 ($) f x
 
 ------------------------------------------------------------------------------
 -- Ex 12: Reimplement fmap using liftA2 and pure. In practical terms,
