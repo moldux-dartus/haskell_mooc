@@ -149,8 +149,7 @@ lock l = l
 -- nothing happens.
 changeCode :: String -> Lock -> Lock
 changeCode newCode (Open code) = Open newCode
-changecode _ l = l
-
+changeCode _ (Closed code) = Closed code
 ------------------------------------------------------------------------------
 -- Ex 7: Here's a type Text that just wraps a String. Implement an Eq
 -- instance for Text that ignores all white space (space characters

@@ -203,12 +203,13 @@ simplify (RationalNumber a b) = RationalNumber (a `div` x) (b `div` x)
 --   signum (RationalNumber 0 2)             ==> RationalNumber 0 1
 
 instance Num RationalNumber where
-  p + q = todo
-  p * q = todo
-  abs q = todo
-  signum q = todo
-  fromInteger x = todo
-  negate q = todo
+  (RationalNumber n1 d1) + (RationalNumber n2 d2) =
+    simplify $ RationalNumber ((n1*d2) + (n2*d1)) (d1*d2)
+  (RationalNumber n1 d1) * (RationalNumber n2 d2)= simplify $ RationalNumber (n1*n2) (d1*d2)
+  abs (RationalNumber n d) = RationalNumber (abs n) (abs d)
+  signum (RationalNumber n d) = RationalNumber (signum n) (signum d)
+  fromInteger x = RationalNumber x 1
+  negate (RationalNumber n d) = RationalNumber (negate n) d
 
 ------------------------------------------------------------------------------
 -- Ex 11: a class for adding things. Define a class Addable with a
